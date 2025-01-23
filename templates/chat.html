@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-question {
+            color: blue;
+            font-weight: bold;
+        }
+        .bot-answer {
+            color: green;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .controls button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Chat with Your Document</h1>
+        {% if conversation %}
+            <div id="chat-history">
+                {% for message in conversation %}
+                    <div class="message">
+                        <p class="user-question">Q: {{ message.question }}</p>
+                        <p class="bot-answer">A: {{ message.answer }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No conversation yet. Start asking questions!</p>
+        {% endif %}
+        <form action="/chat" method="POST">
+            <input type="text" name="question" placeholder="Ask a question..." required>
+            <button type="submit">Send</button>
+        </form>
+        <div class="controls">
+            <form action="/refresh_chat" method="POST" style="display:inline;">
+                <button type="submit">Refresh Chat</button>
+            </form>
+            <form action="/upload_new_document" method="POST" style="display:inline;">
+                <button type="submit">Upload New Document</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
