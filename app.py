@@ -10,6 +10,13 @@ app.secret_key = os.urandom(24)
 # Initialize Vector DB
 vector_db = VectorDB()
 
+def split_into_chunks(text, chunk_size=512):
+    # Split text into chunks of approximately `chunk_size` characters
+    words = text.split()
+    chunks = [' '.join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
+    return chunks
+
+
 @app.route('/')
 def index():
     # Clear session to start fresh if coming back to the upload page
@@ -31,12 +38,20 @@ def upload_file():
 def process_document_page():
     filename = session.get('filename')
     if filename:
-        # Process the document to create embeddings
-        text = process_document(filename)
-        embeddings = create_embeddings(text)
-        vector_db.store_embeddings(embeddings)
+        # Process the document to extract text
+        text = process_document(filename)  # Extract the text content from the document
+        
+        # Split the text into chunks (if needed) and create embeddings
+        chunks = split_into_chunks(text)  # A utility function to split text into smaller chunks
+        embeddings = create_embeddings(chunks)  # Generate embeddings for each chunk
+        
+        # Store embeddings and corresponding chunks in the vector database
+        vector_db.store_embeddings(embeddings, chunks)
+        
         return render_template('chat.html', filename=filename, conversation=[])
+    
     return redirect(url_for('index'))
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
